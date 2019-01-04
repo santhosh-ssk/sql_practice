@@ -1,0 +1,119 @@
+﻿Assignment 1
+
+
+1. mysql> CREATE TABLE CUSTOMER (CUST_ID int not null PRIMARY KEY check(CUST_ID>=100                                                                                  UST_TYPE varchar(100) check (CUST_TYPE='manufacturer' OR CUST_TYPE='wholesaler' OR CUST_TYPE='retailer') );
+
+
+
+
+1. INSERT INTO CUSTOMER values(100,'Revathi',1000000,'manufacturer'),(101,'Richa',1800000,'wholesaler'),(102,'Rishi',1000000,'retailer'),(103,'Rijesh',4000000,'wholesaler'),(104,'Kalyan',4800000,'Wholesaler'),(311,'Karthik',5500000,'retailer');
+
+
+
+
+3) CREATE TABLE TRUCK(TRUCK_ID bigint not null PRIMARY KEY,DRIVER_NAME varchar(100));
+
+
+4) create table CITY(CITY_NAME varchar(100) NOT NULL PRIMARY KEY,POPULATION BigInt);
+
+
+
+
+
+
+5) mysql> CREATE TABLE SHIPMENT(SHIPMENT_ID int not null PRIMARY KEY,CUST_ID int,FOREIGN KEY(CUST_ID) REFERENCES CUSTOMER(CUST_ID) ON DELETE CASCADE,WEIGHT float default 0 check (WEIGHT <1000), TRUCK_ID bigint, FOREIGN KEY(TRUCK_ID) REFERENCES TRUCK(TRUCK_ID) ON DELETE SET NULL,DESTINATION varchar(100),FOREIGN KEY(DESTINATION) REFERENCES CITY(CITY_NAME) ON DELETE SET NULL,SHIP_DATE varchar(12));
+
+
+
+
+
+
+6)  insert into TRUCK values (100,'Jensen'),(101,'Sasi'),(102,'Hrithik'),(103,'Jake Stinson');
+
+
+
+
+7)insert into CITY values ('London',100000000),('Paris',120000000),('Rome',200000000),('Panama City',12300000),('San Francisco',20000000),('Sioux City',5000000000),('Manhattan',10000000),('Los Angeles',7000),('Baltimore',2000),('Denver',100),('St. Louis',5000);
+
+
+
+
+8)  INSERT INTO SHIPMENT VALUES (100, 100, 500, 100, 'London', Null), (101, 101, 100, 102, 'Paris', Null), (102, 101, 300, 103, 'London', Null), (103, 101, 10, 102, 'Panama City', '12-Dec-03'), (104, 101, 20, 101, 'Los Angeles', Null), (105, 102, 200, 102, 'Rome', Null), (106, 100, 50, 101, 'Sioux City', '18-Sep-03'), (107, 104, 500, 100, 'Manhattan', Null), (108, 103, 50, 103, 'San Francisco', Null), (109, 104, 25, 101, 'San Francisco', Null), (110, 102, 200, 103, 'London', '11-Oct-98'), (111, 103, 100, 101, 'London', '09-Sep-99'), (112, 104, 500, 100, 'London', '18-Jun-88'), (113, 104, 200, 100, 'London', '11-Oct-98'), (114, 104, 50, 103, 'Manhattan', '29-May-03'), (115, 100, 75, 103, 'Los Angeles', '17-Sep-02'), (116, 101, 55, 102, 'Baltimore', '01-Jul-02'), (117, 103, 45, 101, 'Paris', Null), (118, 103, 45, 100, 'Rome', Null), (119, 103, 45, 102, 'Los Angeles', Null), (120, 104, 45, 102, 'London', Null), (121, 100, 150, 102, 'Sioux City', Null), (122, 101, 500, 102, 'Manhattan', Null), (123, 102, 250, 102, 'San Francisco', '31-Jul-02'), (124, 311, 0.5, 102, 'Denver', Null), (125, 311, 100, 102, 'St. Louis', Null);
+
+
+
+
+1. select distinct CUSTOMER.CUST_ID,CUST_NAME from CUSTOMER,SHIPMENT where CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and DESTINATION='Sioux City';
+
+
+1. select DESTINATION from CUSTOMER,SHIPMENT where CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and ANNUAL_REVENUE<1000000;
+Empty set (0.00 sec)
+
+
+     c)   select distinct CITY_NAME,POPULATION from  CITY LEFT JOIN SHIPMENT ON 
+           DESTINATION=CITY_NAME where WEIGHT>100;   
+
+
+
+
+d) select distinct CUSTOMER.CUST_ID,CUST_NAME  from CUSTOMER,SHIPMENT where CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and  CUSTOMER.ANNUAL_REVENUE>5000000 ;
+
+
+     e) select distinct CUSTOMER.CUST_ID,CUST_NAME  from CUSTOMER,SHIPMENT where CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and ANNUAL_REVENUE>5000000 and (weight<1 or DESTINATION='San Francisco');
+
+
+f) select distinct TRUCK.TRUCK_ID,DRIVER_NAME from TRUCK,SHIPMENT where TRUCK.TRUCK_ID=SHIPMENT.TRUCK_ID and SHIPMENT.CUST_ID in (Select CUST_ID from CUSTOMER where ANNUAL_REVENUE>20000000) and SHIPMENT.DESTINATION IN (select CITY_NAME from CITY where POPULATION >1000000);
+
+
+g) select CITY_NAME from CITY where CITY_NAME in (select DESTINATION from SHIPMENT,CUSTOMER where CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and ANNUAL_REVENUE>15000000);
+
+
+h)   select distinct DRIVER_NAME from TRUCK left join  SHIPMENT on TRUCK.TRUCK_ID=SHIPMENT.TRUCK_ID where   weight>100;
+
+
+i) select DISTINCT CUST_NAME,ANNUAL_REVENUE from CUSTOMER  JOIN SHIPMENT ON CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and weight>100;
+
+
+j) mysql> select CUST_NAME,ANNUAL_REVENUE from CUSTOMER where CUST_ID in (select distinct CUST_ID from SHIPMENT where TRUCK_ID=(select TRUCK_ID from TRUCK where DRIVER_NAME="Jensen"));
+
+
+k) SELECT CUST_NAME FROM CUSTOMER WHERE NOT EXISTS (SELECT * FROM TRUCK WHERE NOT EXISTS(SELECT * FROM SHIPMENT WHERE TRUCK.TRUCK_ID=SHIPMENT.TRUCK_ID AND CUSTOMER.CUST_ID=SHIPMENT.CUST_ID));
+
+
+l)  select CITY_NAME from CITY where NOT EXISTS (SELECT * from CUSTOMER where NOT EXISTS (SELECT * from SHIPMENT where SHIPMENT.CUST_ID=CUSTOMER.CUST_ID and DESTINATION=CITY_NAME));
+
+
+m) mysql> select driver_name from TRUCK where NOT EXISTS (select * from CITY where NOT EXISTS(select * from SHIPMENT where SHIPMENT.TRUCK_ID=TRUCK.TRUCK_ID and DESTINATION=CITY_NAME));
+ 
+n) select CUSTOMER.CUST_ID,CUST_NAME,DESTINATION,CUST_TYPE from CUSTOMER join SHIPMENT on SHIPMENT.CUST_ID = CUSTOMER.CUST_ID where DESTINATION='St. Louis' or CUST_TYPE='manufacturer';
+
+
+0) > select CITY_NAME,population from CITY join SHIPMENT on DESTINATION=CITY_NAME where population>1000000 and weight=100 and CUST_ID=311;
+
+
+p) select DESTINATION from SHIPMENT join TRUCK on TRUCK.TRUCK_ID=SHIPMENT.TRUCK_ID where driver_name='Jake Stinson' and DESTINATION!='Denver';
+
+
+q)  select CUSTOMER.CUST_ID,CUST_NAME from CUSTOMER join SHIPMENT on CUSTOMER.CUST_ID=SHIPMENT.CUST_ID where ANNUAL_REVENUE>10000000 and DESTINATION in (select CITY_NAME from CITY where population<10000);
+
+
+
+
+
+
+r) a)   create view view_1 as select * from CUSTOMER where ANNUAL_REVENUE<1000000;
+b)  create view view_2 as select * from CUSTOMER where ANNUAL_REVENUE>=1000000 and  ANNUAL_REVENUE<=5000000;
+
+
+c) create view view_3 as select * from CUSTOMER where  ANNUAL_REVENUE>5000000;
+
+
+
+
+s) a)  create view view_4 as select * from TRUCK where TRUCK.TRUCK_ID in (SELECT TRUCK_ID from SHIPMENT join CUSTOMER where SHIPMENT.CUST_ID=CUSTOMER.CUST_ID and ANNUAL_REVENUE>5000000 and DESTINATION='Los Angeles');
+
+
+b) create view view_5 as select * from CITY where CITY_NAME in (SELECT DESTINATION from SHIPMENT join CUSTOMER ON CUSTOMER.CUST_ID=SHIPMENT.CUST_ID and ANNUAL_REVENUE>=1000000 and ANNUAL_REVENUE<=5000000);
+
+
+c) create view view_6 as select CITY_NAME,population from CITY where CITY_NAME in (SELECT DESTINATION from SHIPMENT join CUSTOMER on SHIPMENT.CUST_ID=CUSTOMER.CUST_ID where ANNUAL_REVENUE<=1000000);
